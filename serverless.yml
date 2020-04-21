@@ -1,0 +1,40 @@
+service:
+  name: aws-cost-function
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-offline-scheduler
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ap-northeast-1
+  role: 'set your aws lambda execution role arn.'
+  stage: ${opt:stage, self:custom.defaultStage}
+
+custom:
+  defaultStage: dev
+  http:
+    dev:
+      private: false
+    prd:
+      private: true
+  environment:
+    dev:
+      SLS_DEBUG: '*'
+      COST_WEB_HOOK_URL: 'set your slack web hook url'
+    prd:
+      COST_WEB_HOOK_URL: 'set your slack web hook url'
+
+functions:
+  app:
+    handler: handler.index
+    environment: ${self:custom.environment.${self:provider.stage}}
+    events:
+       # 毎朝10:00 (CRONはUTCで記載)
+       - schedule: cron(0 1 * * ? *)
+#       - http:
+#           path: cost
+#           method: GET
+#           private: ${self:custom.http.${self:provider.stage}.private}
