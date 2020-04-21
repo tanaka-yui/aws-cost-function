@@ -1,4 +1,4 @@
-# casty-aws-cost
+# aws-cost-function
 
 ## setup
 ```shell script
